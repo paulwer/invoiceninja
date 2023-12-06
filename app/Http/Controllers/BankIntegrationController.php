@@ -553,10 +553,10 @@ class BankIntegrationController extends BaseController
     private function refreshAccountsYodlee(Account $account)
     {
 
-        if (!$account->bank_integration_yodlee_account_id)
+        if (!$account->bank_integration_account_id)
             return response()->json(['message' => 'Not yet authenticated with Bank Integration service'], 400);
 
-        $yodlee = new Yodlee($account->bank_integration_yodlee_account_id);
+        $yodlee = new Yodlee($account->bank_integration_account_id);
 
         $accounts = $yodlee->getAccounts();
 
@@ -673,10 +673,10 @@ class BankIntegrationController extends BaseController
 
     private function removeAccountYodlee(Account $account, BankIntegration $bank_integration)
     {
-        if (!$account->bank_integration_yodlee_account_id)
+        if (!$account->bank_integration_account_id)
             return response()->json(['message' => 'Not yet authenticated with Bank Integration service'], 400);
 
-        $yodlee = new Yodlee($account->bank_integration_yodlee_account_id);
+        $yodlee = new Yodlee($account->bank_integration_account_id);
         $yodlee->deleteAccount($bank_integration->bank_account_id);
     }
 

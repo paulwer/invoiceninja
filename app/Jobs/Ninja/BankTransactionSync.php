@@ -53,7 +53,7 @@ class BankTransactionSync implements ShouldQueue
 
             nlog("syncing transactions - yodlee");
 
-            Account::with('bank_integrations')->whereNotNull('bank_integration_yodlee_account_id')->cursor()->each(function ($account) {
+            Account::with('bank_integrations')->whereNotNull('bank_integration_account_id')->cursor()->each(function ($account) {
 
                 if ($account->isPaid() && $account->plan == 'enterprise') {
 

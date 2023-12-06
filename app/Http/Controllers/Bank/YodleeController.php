@@ -35,11 +35,11 @@ class YodleeController extends BaseController
 
         //ensure user is enterprise!!
 
-        if ($company->account->bank_integration_yodlee_account_id) {
+        if ($company->account->bank_integration_account_id) {
 
             $flow = 'edit';
 
-            $token = $company->account->bank_integration_yodlee_account_id;
+            $token = $company->account->bank_integration_account_id;
 
         } else {
 
@@ -49,7 +49,7 @@ class YodleeController extends BaseController
 
             $token = $response->user->loginName;
 
-            $company->account->bank_integration_yodlee_account_id = $token;
+            $company->account->bank_integration_account_id = $token;
 
             $company->push();
 

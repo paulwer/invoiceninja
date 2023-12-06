@@ -80,7 +80,9 @@ class Account extends BaseModel
         'created_at' => 'timestamp',
         'deleted_at' => 'timestamp',
         'onboarding' => 'object',
-        'set_react_as_default_ap' => 'bool'
+        'set_react_as_default_ap' => 'bool',
+        'bank_integration_nordigen_secret_id' => 'encrypted',
+        'bank_integration_nordigen_secret_key' => 'encrypted',
     ];
 
     const PLAN_FREE = 'free';
