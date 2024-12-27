@@ -22,8 +22,6 @@ return new class extends Migration {
             $table->unsignedInteger('recurring_invoice_id')->nullable();
             $table->unsignedInteger('subscription_id')->nullable();
             $table->unsignedInteger('quantity')->default(1);
-            $table->decimal('price', 10, 2)->nullable();
-            $table->decimal('discount', 10, 2)->nullable();
             $table->boolean('should_be_invoiced')->default(false);
             $table->string('aggregation_key')->nullable();
             $table->text('public_notes')->nullable();

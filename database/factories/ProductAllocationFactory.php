@@ -23,9 +23,7 @@ class ProductAllocationFactory extends Factory
     public function definition()
     {
         return [
-            'price' => $this->faker->numberBetween(1, 1000),
             'quantity' => $this->faker->numberBetween(1, 100),
-            'discount' => $this->faker->numberBetween(1, 100),
             'should_be_invoiced' => $this->faker->boolean(),
             'custom_value1' => 'https://picsum.photos/200',
             'custom_value2' => rand(0, 100),
