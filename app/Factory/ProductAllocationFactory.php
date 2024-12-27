@@ -23,9 +23,7 @@ class ProductAllocationFactory
         $productAllocation->user_id = $user_id;
         $productAllocation->product_id = $product_id;
 
-        $productAllocation->price = 0;
         $productAllocation->quantity = 1;
-        $productAllocation->discount = 0;
         $productAllocation->custom_value1 = '';
         $productAllocation->custom_value2 = '';
         $productAllocation->custom_value3 = '';

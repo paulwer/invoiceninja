@@ -45,11 +45,8 @@ class StoreProductAllocationRequest extends Request
             $rules['file'] = $this->fileValidation();
         }
 
-        $rules['price'] = 'sometimes|numeric';
         $rules['quantity'] = 'sometimes|numeric';
-        $rules['discount'] = 'sometimes|numeric';
         $rules['should_be_invoiced'] = 'sometimes|bool';
-
 
         return $rules;
     }
@@ -65,10 +62,6 @@ class StoreProductAllocationRequest extends Request
         if (array_key_exists('assigned_user_id', $input) && is_string($input['assigned_user_id'])) {
             $input['assigned_user_id'] = $this->decodePrimaryKey($input['assigned_user_id']);
         }
-
-        $input['tax_name1'] = $input['tax_name1'] ?? '';
-        $input['tax_name2'] = $input['tax_name2'] ?? '';
-        $input['tax_name3'] = $input['tax_name3'] ?? '';
 
         $this->replace($input);
     }

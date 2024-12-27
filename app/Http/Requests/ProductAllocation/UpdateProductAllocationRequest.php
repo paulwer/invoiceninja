@@ -48,9 +48,7 @@ class UpdateProductAllocationRequest extends Request
             $rules['file'] = $this->fileValidation();
         }
 
-        $rules['price'] = 'sometimes|numeric';
         $rules['quantity'] = 'sometimes|numeric';
-        $rules['discount'] = 'sometimes|numeric';
         $rules['should_be_invoiced'] = 'sometimes|bool';
 
         return $rules;
@@ -66,11 +64,6 @@ class UpdateProductAllocationRequest extends Request
 
         if (array_key_exists('assigned_user_id', $input) && is_string($input['assigned_user_id'])) {
             $input['assigned_user_id'] = $this->decodePrimaryKey($input['assigned_user_id']);
-        }
-
-        if (array_key_exists('in_stock_quantity', $input) && request()->has('update_in_stock_quantity') && request()->input('update_in_stock_quantity') == 'true') {
-        } elseif (array_key_exists('in_stock_quantity', $input)) {
-            unset($input['in_stock_quantity']);
         }
 
         $this->replace($input);
