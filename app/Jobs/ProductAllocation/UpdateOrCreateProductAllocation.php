@@ -70,6 +70,8 @@ class UpdateOrCreateProductAllocation implements ShouldQueue
             return $item->type_id == 1;
         });
 
+        $product_ids = [];
+
         /** @var \App\DataMapper\InvoiceItem $item */
         foreach ($updateable_products as $item) {
             if (empty($item->product_key) || (isset($item->product_allocation_ids) && count($item->product_allocation_ids) > 0)) {
@@ -88,21 +90,32 @@ class UpdateOrCreateProductAllocation implements ShouldQueue
             $productAllocation->project_id = $this->invoice->project_id ?? null;
             $productAllocation->subscription_id = $this->invoice->subscription_id ?? null;
 
-            // aggregate quantity of all items with same product_key
+            // aggregate quantity of all items with same product_key & none linked product_allocation_ids
             $productAllocation->quantity = $updateable_products->filter(function ($i) use ($item) {
-                return $i->product_key == $item->product_key;
+                return $i->product_key == $item->product_key && !(isset($item->product_allocation_ids) && count($item->product_allocation_ids) > 0);
             })->sum('quantity');
 
-            // delete when not required and save if it does
-            if ($productAllocation->quantity == 0 && $productAllocation->id) {
-                $productAllocation->delete();
-            } else {
-                $product->saveQuietly();
-                $productAllocation->saveQuietly();
+            // skip, when not required
+            if ($productAllocation->quantity == 0) {
+                continue;
             }
 
-            // TODO: determine if stock quantity of product should be updated
+            // add to array of valid product_ids of mappers for this invoice
+            $product_ids[] = $product->id;
+
+            // save
+            $product->saveQuietly();
+            $productAllocation->saveQuietly();
+
         }
+
+        // remove all invalid mappers
+        $productAllocation = ProductAllocation::withTrashed()
+            ->whereNotIn('product_id', $product_ids)
+            ->where('company_id', $this->invoice->company->id)
+            ->where('invoice_id', $this->invoice->id)
+            ->where('aggregation_key', 'invoice-product-mapper')
+            ->delete();
     }
 
     public function failed($exception = null)
