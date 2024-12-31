@@ -24,6 +24,7 @@ return new class extends Migration {
             $table->unsignedInteger('quantity')->default(1);
             $table->boolean('should_be_invoiced')->default(false);
             $table->string('aggregation_key')->nullable();
+            $table->string('serial_number')->nullable();
             $table->text('public_notes')->nullable();
             $table->text('private_notes')->nullable();
             $table->string('custom_value1')->nullable();

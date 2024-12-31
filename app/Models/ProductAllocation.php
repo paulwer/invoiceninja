@@ -29,7 +29,9 @@ use League\CommonMark\CommonMarkConverter;
  * @property int|null $recurring_id
  * @property int|null $subscription_id
  * @property float $quantity
+ * @property bool $should_be_invoiced
  * @property string|null $aggregation_key
+ * @property string|null $serial_number
  * @property string|null $custom_value1
  * @property string|null $custom_value2
  * @property string|null $custom_value3
@@ -65,6 +67,7 @@ class ProductAllocation extends BaseModel
         'quantity',
         'should_be_invoiced',
         'aggregation_key',
+        'serial_number',
         'custom_value1',
         'custom_value2',
         'custom_value3',

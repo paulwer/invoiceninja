@@ -50,6 +50,8 @@ class UpdateProductAllocationRequest extends Request
 
         $rules['quantity'] = 'sometimes|numeric';
         $rules['should_be_invoiced'] = 'sometimes|bool';
+        $rules['serial_number'] = 'sometimes|string';
+        $rules['aggregation_key'] = 'sometimes|string';
 
         return $rules;
     }

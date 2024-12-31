@@ -33,7 +33,7 @@ class ProductAllocationRepository extends BaseRepository
         $productAllocation;
 
         // try to find existing one to aggregate
-        if (!empty($data['aggregation_key'])) {
+        if (!empty($data['aggregation_key']) && empty($data['invoice_id'])) {
 
             // find unique entry
             $query = ProductAllocation::where('aggregation_key', $data['aggregation_key'])
@@ -42,31 +42,34 @@ class ProductAllocationRepository extends BaseRepository
                 ->where('product_id', $product_id)
                 ->where('client_id', $data['client_id'] ?? null)
                 ->where('project_id', $data['project_id'] ?? null)
-                ->where('invoice_id', $data['invoice_id'] ?? null)
+                ->where('invoice_id', null)
                 ->where('recurring_id', $data['recurring_id'] ?? null)
                 ->where('subscription_id', $data['subscription_id'] ?? null);
 
             // custom queries for aggregationKey useable with custom time frames
-            if ($data['aggregation_key'] === 'hourly') {
-                $query = $query->where('created_at', '>=', Carbon::now()->subHour());
-            } else if ($data['aggregation_key'] === 'daily') {
-                $query = $query->whereDate('created_at', '=', Carbon::now()->toDateString());
-            } else if ($data['aggregation_key'] === 'weekly') {
-                $query = $query->whereBetween('created_at', [
-                    Carbon::now()->startOfWeek(Carbon::MONDAY),
-                    Carbon::now()->endOfWeek(Carbon::SUNDAY)
-                ]);
-            } else if ($data['aggregation_key'] === 'monthly') {
-                $query = $query->whereYear('created_at', '=', Carbon::now()->year)
-                    ->whereMonth('created_at', '=', Carbon::now()->month);
-            } else if ($data['aggregation_key'] === 'yearly') {
-                $query = $query->whereYear('created_at', '=', Carbon::now()->year);
-            } else if (Carbon::hasFormat(Carbon::now(), $data['aggregation_key'])) {                 // For unsupported or custom time frame formats
-                $query = $query->whereDate('created_at', '>', Carbon::now()->format($data['aggregation_key']));
+            if (!empty($data['aggregation_intervall'])) {
+
+                if ($data['aggregation_intervall'] === 'hourly') {
+                    $query = $query->where('created_at', '>=', Carbon::now()->subHour());
+                } else if ($data['aggregation_intervall'] === 'daily') {
+                    $query = $query->where('created_at', '>=', Carbon::now()->subDay());
+                } else if ($data['aggregation_intervall'] === 'weekly') {
+                    $query = $query->whereBetween('created_at', [
+                        Carbon::now()->startOfWeek(Carbon::MONDAY),
+                        Carbon::now()->endOfWeek(Carbon::SUNDAY)
+                    ]);
+                } else if ($data['aggregation_intervall'] === 'monthly') {
+                    $query = $query->whereYear('created_at', '=', Carbon::now()->year)
+                        ->whereMonth('created_at', '=', Carbon::now()->month);
+                } else if ($data['aggregation_intervall'] === 'yearly') {
+                    $query = $query->whereYear('created_at', '=', Carbon::now()->year);
+                } else if (Carbon::hasFormat(Carbon::now(), $data['aggregation_key'])) {                 // For unsupported or custom time frame formats
+                    $query = $query->whereDate('created_at', '>', Carbon::now()->format($data['aggregation_key']));
+                }
             }
 
             // fetch data
-            $productAllocation = $query->orderBy('created_at')->first();
+            $productAllocation = $query->orderBy('created_at', 'desc')->first();
 
             // checks and modifications to input data
             if (!empty($productAllocation)) {
