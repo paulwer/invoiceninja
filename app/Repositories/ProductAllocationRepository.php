@@ -32,8 +32,8 @@ class ProductAllocationRepository extends BaseRepository
         /** @var ProductAllocation $productAllocation */
         $productAllocation;
 
-        // try to find existing one to aggregate
-        if (!empty($data['aggregation_key']) && empty($data['invoice_id'])) {
+        // aggregation of entries for products, which are likly not equipments and not assigned to an invoice
+        if (!empty($data['aggregation_key']) && empty($data['invoice_id']) && empty($data['serial_number'])) {
 
             // find unique entry
             $query = ProductAllocation::where('aggregation_key', $data['aggregation_key'])
