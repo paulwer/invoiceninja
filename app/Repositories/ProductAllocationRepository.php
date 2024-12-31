@@ -43,7 +43,7 @@ class ProductAllocationRepository extends BaseRepository
                 ->where('client_id', $data['client_id'] ?? null)
                 ->where('project_id', $data['project_id'] ?? null)
                 ->where('invoice_id', $data['invoice_id'] ?? null)
-                ->where('recurring_invoice_id', $data['recurring_invoice_id'] ?? null)
+                ->where('recurring_id', $data['recurring_id'] ?? null)
                 ->where('subscription_id', $data['subscription_id'] ?? null);
 
             // custom queries for aggregationKey useable with custom time frames

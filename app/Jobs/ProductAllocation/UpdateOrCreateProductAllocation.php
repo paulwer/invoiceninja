@@ -86,7 +86,7 @@ class UpdateOrCreateProductAllocation implements ShouldQueue
                 'invoice_id' => $this->invoice->id,
                 'aggregation_key' => 'invoice-product-mapper',
             ]);
-            $productAllocation->recurring_invoice_id = $this->invoice->recurring_id ?? null;
+            $productAllocation->recurring_id = $this->invoice->recurring_id ?? null;
             $productAllocation->project_id = $this->invoice->project_id ?? null;
             $productAllocation->subscription_id = $this->invoice->subscription_id ?? null;
 

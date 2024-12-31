@@ -151,7 +151,6 @@ class Account extends BaseModel
     public const FEATURE_EXPENSES = 'expenses';
     public const FEATURE_QUOTES = 'quotes';
     public const FEATURE_PURCHASE_ORDERS = 'purchase_orders';
-    public const FEATURE_PRODUCT_ALLOCATION = 'product_allocation';
     public const FEATURE_CUSTOMIZE_INVOICE_DESIGN = 'custom_designs';
     public const FEATURE_DIFFERENT_DESIGNS = 'different_designs';
     public const FEATURE_EMAIL_TEMPLATES_REMINDERS = 'template_reminders';
@@ -243,7 +242,6 @@ class Account extends BaseModel
             case self::FEATURE_EXPENSES:
             case self::FEATURE_QUOTES:
             case self::FEATURE_PURCHASE_ORDERS:
-            case self::FEATURE_PRODUCT_ALLOCATION:
                 return true;
 
             case self::FEATURE_CUSTOMIZE_INVOICE_DESIGN:

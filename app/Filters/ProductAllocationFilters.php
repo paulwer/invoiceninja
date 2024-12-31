@@ -177,7 +177,7 @@ class ProductAllocationFilters extends QueryFilters
             return $this->builder;
         }
 
-        return $this->builder->whereIn('recurring_invoice_id', explode(",", $filter));
+        return $this->builder->whereIn('recurring_id', explode(",", $filter));
 
     }
 

@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->unsignedInteger('client_id')->nullable();
             $table->unsignedInteger('project_id')->nullable();
             $table->unsignedInteger('invoice_id')->nullable();
-            $table->unsignedInteger('recurring_invoice_id')->nullable();
+            $table->unsignedInteger('recurring_id')->nullable();
             $table->unsignedInteger('subscription_id')->nullable();
             $table->unsignedInteger('quantity')->default(1);
             $table->boolean('should_be_invoiced')->default(false);
@@ -45,7 +45,7 @@ return new class extends Migration {
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('recurring_invoice_id')->references('id')->on('recurring_invoices')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('recurring_id')->references('id')->on('recurring_invoices')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('subscription_id')->references('id')->on('subscriptions')->onDelete('cascade')->onUpdate('cascade');
         });
     }
