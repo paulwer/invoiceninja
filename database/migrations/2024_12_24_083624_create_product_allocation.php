@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('product_allocation', function (Blueprint $table) {
+        Schema::create('product_allocations', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('company_id')->index();
             $table->unsignedInteger('user_id')->index();
@@ -33,6 +33,7 @@ return new class extends Migration {
             $table->string('custom_value4')->nullable();
             $table->timestamps(6);
             $table->softDeletes('deleted_at', 6);
+            $table->boolean('is_deleted')->default(false);
 
             $table->index(['company_id', 'deleted_at']);
             $table->index(['user_id', 'company_id']);

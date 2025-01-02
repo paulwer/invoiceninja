@@ -137,7 +137,9 @@ class ProductAllocationController extends BaseController
         $user = auth()->user();
         $data = $request->all();
 
-        $productAllocation = ProductAllocationFactory::create($user->company()->id, $user->id, $data['product_id']);
+        nlog(json_encode($data));
+
+        $productAllocation = ProductAllocationFactory::create($user->company()->id, $user->id, array_key_exists('product_id', $data) ? $data['product_id'] : 0);
 
         return $this->itemResponse($productAllocation);
     }

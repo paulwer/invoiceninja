@@ -69,10 +69,9 @@ class SendRecurring implements ShouldQueue
             ->whereIn('client_id', [$this->recurring_invoice->client->id, null])
             ->where('should_be_invoiced')
             ->all()->toArray();
-        if (count($product_allocations)) {
+        if (count($product_allocations) > 0) {
             $invoice = $invoice->service()
-                ->applyProductAllocations($product_allocations)
-                ->save();
+                ->applyProductAllocations($product_allocations);
         }
 
         $date = date('Y-m-d'); //@todo this will always pull UTC date.
