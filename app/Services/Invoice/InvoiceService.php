@@ -37,6 +37,18 @@ class InvoiceService
     }
 
     /**
+     * Applies product allocations to the invoice line_items
+     * by upserting those entries.
+     * @param ProductAllocation[] $products
+     */
+    public function applyProductAllocations(array $product_allocations)
+    {
+        $this->invoice = (new ApplyProductAllocations($this->invoice, $product_allocations))->run();
+
+        return $this;
+    }
+
+    /**
      * Marks as invoice as paid
      * and executes child sub functions.
      * @return $this InvoiceService object
