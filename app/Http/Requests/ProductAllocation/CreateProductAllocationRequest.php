@@ -13,6 +13,7 @@ namespace App\Http\Requests\ProductAllocation;
 
 use App\Http\Requests\Request;
 use App\Models\Product;
+use App\Models\ProductAllocation;
 
 class CreateProductAllocationRequest extends Request
 {
@@ -23,7 +24,7 @@ class CreateProductAllocationRequest extends Request
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('create', Product::class);
+        return auth()->user()->can('create', ProductAllocation::class);
     }
 
     public function rules(): array

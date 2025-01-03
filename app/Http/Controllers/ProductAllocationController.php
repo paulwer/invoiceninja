@@ -22,7 +22,6 @@ use App\Http\Requests\ProductAllocation\StoreProductAllocationRequest;
 use App\Http\Requests\ProductAllocation\UpdateProductAllocationRequest;
 use App\Http\Requests\ProductAllocation\UploadProductAllocationRequest;
 use App\Models\Account;
-use App\Models\Product;
 use App\Models\ProductAllocation;
 use App\Repositories\ProductAllocationRepository;
 use App\Transformers\ProductAllocationTransformer;
@@ -319,7 +318,7 @@ class ProductAllocationController extends BaseController
      *      @OA\Parameter(
      *          name="id",
      *          in="path",
-     *          description="The ProductAllocation Hashed ID",
+     *          description="The ProductAllocation ID",
      *          example="D2J234DFA",
      *          required=true,
      *          @OA\Schema(

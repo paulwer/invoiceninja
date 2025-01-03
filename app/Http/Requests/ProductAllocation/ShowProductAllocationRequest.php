@@ -22,7 +22,7 @@ class ShowProductAllocationRequest extends Request
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('view', $this->product);
+        return auth()->user()->can('view', $this->productAllocation);
     }
 
     /**

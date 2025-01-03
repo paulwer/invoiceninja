@@ -306,7 +306,7 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
     Route::post('products/bulk', [ProductController::class, 'bulk'])->name('products.bulk');
     Route::put('products/{product}/upload', [ProductController::class, 'upload']);
 
-    Route::resource('product_allocations', ProductAllocationController::class); // name = (products. index / create / show / update / destroy / edit
+    Route::resource('product_allocations', ProductAllocationController::class); // name = (productAllocations. index / create / show / update / destroy / edit
     Route::post('product_allocations/bulk', [ProductAllocationController::class, 'bulk'])->name('product_allocations.bulk');
     Route::put('product_allocations/{productAllocation}/upload', [ProductAllocationController::class, 'upload']);
 

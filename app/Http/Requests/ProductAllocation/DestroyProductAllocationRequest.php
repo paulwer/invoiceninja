@@ -22,6 +22,6 @@ class DestroyProductAllocationRequest extends Request
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('edit', $this->product);
+        return auth()->user()->can('edit', $this->productAllocation);
     }
 }
