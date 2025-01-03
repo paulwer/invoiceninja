@@ -31,6 +31,10 @@ class ProductAllocationTransformer extends EntityTransformer
     protected array $availableIncludes = [
         'company',
         'user',
+        'invoice',
+        'recurring_invoice',
+        'project',
+        'subscription',
     ];
 
     /**
@@ -57,6 +61,59 @@ class ProductAllocationTransformer extends EntityTransformer
         return $this->includeItem($productAllocation->company, $transformer, Company::class);
     }
 
+    /**
+     * @param ProductAllocation $productAllocation
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function includeInvoice(ProductAllocation $productAllocation)
+    {
+        $transformer = new InvoiceTransformer($this->serializer);
+
+        return $this->includeItem($productAllocation->invoice, $transformer, Invoice::class);
+    }
+
+    /**
+     * @param ProductAllocation $productAllocation
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function includeRecurringInvoice(ProductAllocation $productAllocation)
+    {
+        $transformer = new RecurringInvoiceTransformer($this->serializer);
+
+        return $this->includeItem($productAllocation->recurring_invoice, $transformer, RecurringInvoice::class);
+    }
+
+    /**
+     * @param ProductAllocation $productAllocation
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function includeProject(ProductAllocation $productAllocation)
+    {
+        $transformer = new ProjectTransformer($this->serializer);
+
+        return $this->includeItem($productAllocation->project, $transformer, Project::class);
+    }
+
+    /**
+     * @param ProductAllocation $productAllocation
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function includeSubscription(ProductAllocation $productAllocation)
+    {
+        $transformer = new SubscriptionTransformer($this->serializer);
+
+        return $this->includeItem($productAllocation->subscription, $transformer, Subscription::class);
+    }
+
+    /**
+     * @param ProductAllocation $productAllocation
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
     public function includeDocuments(ProductAllocation $productAllocation)
     {
         $transformer = new DocumentTransformer($this->serializer);
@@ -70,10 +127,11 @@ class ProductAllocationTransformer extends EntityTransformer
             'id' => $this->encodePrimaryKey($productAllocation->id),
             'user_id' => $this->encodePrimaryKey($productAllocation->user_id),
             'assigned_user_id' => $this->encodePrimaryKey($productAllocation->assigned_user_id),
-            'product_id' => $productAllocation->product_id ?: '',
+            'product_key' => $productAllocation->product()->product_key ?: '',
             'client_id' => $productAllocation->client_id ?: '',
             'invoice_id' => $productAllocation->invoice_id ?: '',
             'recurring_id' => $productAllocation->recurring_id ?: '',
+            'project_id' => $productAllocation->project_id ?: '',
             'subscription_id' => $productAllocation->subscription_id ?: '',
             'quantity' => is_numeric($productAllocation->quantity) ? (float) $productAllocation->quantity : (float) 1.0, //@phpstan-ignore-line
             'created_at' => (int) $productAllocation->created_at,

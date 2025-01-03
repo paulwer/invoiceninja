@@ -22,6 +22,7 @@ use App\Http\Requests\ProductAllocation\StoreProductAllocationRequest;
 use App\Http\Requests\ProductAllocation\UpdateProductAllocationRequest;
 use App\Http\Requests\ProductAllocation\UploadProductAllocationRequest;
 use App\Models\Account;
+use App\Models\Product;
 use App\Models\ProductAllocation;
 use App\Repositories\ProductAllocationRepository;
 use App\Transformers\ProductAllocationTransformer;
@@ -137,8 +138,6 @@ class ProductAllocationController extends BaseController
         $user = auth()->user();
         $data = $request->all();
 
-        nlog(json_encode($data));
-
         $productAllocation = ProductAllocationFactory::create($user->company()->id, $user->id, array_key_exists('product_id', $data) ? $data['product_id'] : 0);
 
         return $this->itemResponse($productAllocation);
@@ -187,9 +186,8 @@ class ProductAllocationController extends BaseController
 
         /** @var \App\Models\User $user */
         $user = auth()->user();
-        $data = $request->all();
 
-        $productAllocation = $this->product_allocation_repo->create($user->company()->id, $user->id, $data['product_id'], $data);
+        $productAllocation = $this->product_allocation_repo->create($user->company()->id, $user->id, $request->all());
 
         return $this->itemResponse($productAllocation);
     }

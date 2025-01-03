@@ -29,6 +29,18 @@ class CreateProductAllocationRequest extends Request
     public function rules(): array
     {
         return [
+            'product_key' => 'required|string',
         ];
+    }
+
+    public function prepareForValidation(): void
+    {
+        $input = $this->all();
+
+        if (array_key_exists('product_key', $input) && is_string($input['product_key'])) {
+            $input['product_id'] = Product::where('product_key', $input['product_key'])->first()->id;
+        }
+
+        $this->replace($input);
     }
 }
