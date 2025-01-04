@@ -38,10 +38,10 @@ class ProductAllocationRepository extends BaseRepository
         $productAllocation;
 
         // aggregation of entries for products, which are likly not equipments and not assigned to an invoice
-        if (!empty($data['aggregation_key']) && empty($data['invoice_id']) && empty($data['serial_number'])) {
+        if (!empty($data['invoice_aggregation_key']) && empty($data['invoice_id']) && empty($data['serial_number'])) {
 
             // find unique entry
-            $query = ProductAllocation::where('aggregation_key', $data['aggregation_key'])
+            $query = ProductAllocation::where('invoice_aggregation_key', $data['invoice_aggregation_key'])
                 ->where('company_id', $company_id)
                 ->where('user_id', $user_id)
                 ->where('product_id', $data['product_id'])
@@ -68,8 +68,8 @@ class ProductAllocationRepository extends BaseRepository
                         ->whereMonth('created_at', '=', Carbon::now()->month);
                 } else if ($data['aggregation_intervall'] === 'yearly') {
                     $query = $query->whereYear('created_at', '=', Carbon::now()->year);
-                } else if (Carbon::hasFormat(Carbon::now(), $data['aggregation_key'])) {                 // For unsupported or custom time frame formats
-                    $query = $query->whereDate('created_at', '>', Carbon::now()->format($data['aggregation_key']));
+                } else if (Carbon::hasFormat(Carbon::now(), $data['invoice_aggregation_key'])) {                 // For unsupported or custom time frame formats
+                    $query = $query->whereDate('created_at', '>', Carbon::now()->format($data['invoice_aggregation_key']));
                 }
             }
 
@@ -124,7 +124,7 @@ class ProductAllocationRepository extends BaseRepository
     private function prepareData(array $data): array
     {
         $data['quantity'] ??= 1;
-        $data['aggregation_key'] ??= null;
+        $data['invoice_aggregation_key'] ??= null;
         $data['aggregation_intervall'] ??= null;
         $data['invoice_id'] ??= null;
 

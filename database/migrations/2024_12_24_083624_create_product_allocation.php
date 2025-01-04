@@ -22,9 +22,10 @@ return new class extends Migration {
             $table->unsignedInteger('recurring_id')->nullable();
             $table->unsignedInteger('subscription_id')->nullable();
             $table->unsignedInteger('quantity')->default(1);
-            $table->boolean('should_be_invoiced')->default(false);
-            $table->string('aggregation_key')->nullable();
             $table->string('serial_number')->nullable();
+            $table->boolean('should_be_invoiced')->default(false);
+            $table->string('invoice_aggregation_key')->nullable();
+
             $table->text('public_notes')->nullable();
             $table->text('private_notes')->nullable();
             $table->string('custom_value1')->nullable();

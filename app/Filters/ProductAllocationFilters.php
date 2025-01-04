@@ -33,7 +33,7 @@ class ProductAllocationFilters extends QueryFilters
         }
 
         return $this->builder->where(function ($query) use ($filter) {
-            $query->where('aggregation_key', 'like', '%' . $filter . '%')
+            $query->where('invoice_aggregation_key', 'like', '%' . $filter . '%')
                 ->orWhere('private_notes', 'like', '%' . $filter . '%')
                 ->orWhere('public_notes', 'like', '%' . $filter . '%')
                 ->orWhere('custom_value1', 'like', '%' . $filter . '%')
@@ -51,18 +51,18 @@ class ProductAllocationFilters extends QueryFilters
     }
 
     /**
-     * Filter based on aggregation keys
+     * Filter based on invoice aggregation keys
      * @param string $filter
      * @return Builder
      */
-    public function aggregation_keys(string $filter = ''): Builder
+    public function invoice_aggregation_keys(string $filter = ''): Builder
     {
 
         if (strlen($filter) == 0) {
             return $this->builder;
         }
 
-        return $this->builder->whereIn('aggregation_key', explode(",", $filter));
+        return $this->builder->whereIn('invoice_aggregation_key', explode(",", $filter));
 
     }
 

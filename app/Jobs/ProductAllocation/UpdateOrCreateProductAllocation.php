@@ -84,7 +84,7 @@ class UpdateOrCreateProductAllocation implements ShouldQueue
                 'product_id' => $product->id,
                 'company_id' => $this->invoice->company->id,
                 'invoice_id' => $this->invoice->id,
-                'aggregation_key' => 'invoice-product-mapper',
+                'invoice_aggregation_key' => 'invoice-product-mapper',
             ]);
             $productAllocation->recurring_id = $this->invoice->recurring_id ?? null;
             $productAllocation->project_id = $this->invoice->project_id ?? null;
@@ -114,7 +114,7 @@ class UpdateOrCreateProductAllocation implements ShouldQueue
             ->whereNotIn('product_id', $product_ids)
             ->where('company_id', $this->invoice->company->id)
             ->where('invoice_id', $this->invoice->id)
-            ->where('aggregation_key', 'invoice-product-mapper')
+            ->where('invoice_aggregation_key', 'invoice-product-mapper')
             ->delete();
     }
 

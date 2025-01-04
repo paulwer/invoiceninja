@@ -55,7 +55,7 @@ class ApplyProductAllocations extends AbstractService
         $aggregatedItems = [];
         foreach ($items as $item) {
             // Create a unique key based on the properties you want to group by
-            $key = $item->product()->product_key . '|' . $item->aggregation_key;
+            $key = $item->product()->product_key . '|' . $item->invoice_aggregation_key;
 
             if (isset($aggregatedItems[$key])) {
                 $aggregatedItems[$key]['quantity'] += $item->quantity;
