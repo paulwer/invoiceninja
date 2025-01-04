@@ -64,10 +64,10 @@ class SendRecurring implements ShouldQueue
         $invoice = RecurringInvoiceToInvoiceFactory::create($this->recurring_invoice, $this->recurring_invoice->client);
 
         // populate with outstanding, not already invoiced product allocations
-        $product_allocations = ProductAllocation::where('recurring_id', $this->recurring_invoice->id)
-            ->where('invoice_id', null)
-            ->whereIn('client_id', [$this->recurring_invoice->client->id, null])
+        $product_allocations = $this->recurring_invoice->product_allocations()->withTrashed()
+            ->whereNull('invoice_id')
             ->where('should_be_invoiced')
+            ->where('is_deleted', 0)
             ->all()->toArray();
         if (count($product_allocations) > 0) {
             $invoice = $invoice->service()

@@ -70,22 +70,21 @@ class ApplyProductAllocations extends AbstractService
         $aggregatedItems = array_values($aggregatedItems);
 
         // apply to line_items
-        foreach ($aggregatedItems as $item) {
-            /**
-             * @var InvoiceItem $line_item
-             */
-            $line_item = (object) get_class_vars(InvoiceItem::class);
-            $line_item->product_key = $item->product()->product_key;
-            $line_item->quantity = $item['quantity'];
-            $line_item->cost = $item->product()->cost;
-            $line_item->notes = $item['public_notes'];
-            $line_item->product_allocation_ids = $item['product_allocation_ids'];
-            $line_item->custom_value1 = $item->custom_value1;
-            $line_item->custom_value2 = $item->custom_value2;
-            $line_item->custom_value3 = $item->custom_value3;
-            $line_item->custom_value4 = $item->custom_value4;
+        foreach ($aggregatedItems as $aggregatedItem) {
+            $item = new InvoiceItem();
+            $item->quantity = $aggregatedItem['quantity'];
+            $item->cost = $aggregatedItem->product()->cost;
+            $item->product_key = $aggregatedItem->product()->product_key;
+            $item->line_total = round($item->cost * $item->quantity, 2);
+            $item->notes = $aggregatedItem['public_notes'];
+            $item->custom_value1 = $aggregatedItem->custom_value1;
+            $item->custom_value2 = $aggregatedItem->custom_value2;
+            $item->custom_value3 = $aggregatedItem->custom_value3;
+            $item->custom_value4 = $aggregatedItem->custom_value4;
+            $item->product_allocation_ids = $aggregatedItem['product_allocation_ids'];
+            $item->type_id = '1';
 
-            $this->invoice->line_items[] = $line_item;
+            $this->invoice->line_items[] = $item;
         }
 
         $this->invoice->saveQuietly();
