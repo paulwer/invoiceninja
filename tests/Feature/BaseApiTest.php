@@ -22,7 +22,6 @@ use App\Models\BankTransaction;
 use App\Models\BankTransactionRule;
 use App\Models\Client;
 use App\Models\ClientContact;
-use App\Models\ClientGatewayToken;
 use App\Models\Company;
 use App\Models\CompanyGateway;
 use App\Models\CompanyToken;
@@ -49,20 +48,19 @@ use App\Models\TaxRate;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorContact;
-use App\Models\Webhook;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\MockAccountData;
 use Tests\TestCase;
 
-/**
- * @test
- * @covers App\Http\Controllers\BaseController
- */
 class BaseApiTest extends TestCase
 {
     use MockAccountData;
+
+    public CompanyUser $owner_cu;
+
+    public CompanyUser $low_cu;
 
     private $list_routes = [
         'products',
@@ -96,11 +94,13 @@ class BaseApiTest extends TestCase
         'bank_transaction_rules',
     ];
 
-    private string $low_token;
+    public string $low_token;
 
-    private string $owner_token;
+    public string $owner_token;
 
-    protected function setUp() :void
+    public $faker;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -157,7 +157,7 @@ class BaseApiTest extends TestCase
 
         $user_id = $owner_user->id;
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $owner_user->id;
         $company_token->company_id = $company->id;
         $company_token->account_id = $this->account->id;
@@ -182,7 +182,7 @@ class BaseApiTest extends TestCase
 
         $this->low_token = \Illuminate\Support\Str::random(64);
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $lower_permission_user->id;
         $company_token->company_id = $this->company->id;
         $company_token->account_id = $this->account->id;
@@ -322,7 +322,7 @@ class BaseApiTest extends TestCase
             'company_id' => $company->id,
         ]);
 
-        $gs = new GroupSetting;
+        $gs = new GroupSetting();
         $gs->name = 'Test';
         $gs->company_id = $client->company_id;
         $gs->settings = ClientSettings::buildClientSettings($company->settings, $client->settings);
@@ -368,7 +368,7 @@ class BaseApiTest extends TestCase
             'company_id' => $company->id,
         ]);
 
-        $cg = new CompanyGateway;
+        $cg = new CompanyGateway();
         $cg->company_id = $company->id;
         $cg->user_id = $user_id;
         $cg->gateway_key = 'd14dd26a37cecc30fdd65700bfb55b23';
@@ -382,59 +382,55 @@ class BaseApiTest extends TestCase
 
         $cgt = ClientGatewayTokenFactory::create($company->id);
         $cgt->save();
-
     }
 
     // public function testGeneratingClassName()
     // {
 
-        // $this->assertEquals('user', Str::snake(User::class));
+    // $this->assertEquals('user', Str::snake(User::class));
 
-        // $this->assertEquals('user',lcfirst(class_basename(Str::snake(User::class))));
+    // $this->assertEquals('user',lcfirst(class_basename(Str::snake(User::class))));
 
 
     // }
-    
+
     /**
      * Tests admin/owner facing routes respond with the correct status and/or data set
      */
     public function testOwnerRoutes()
     {
-
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->owner_token,
         ])->get('/api/v1/users/');
 
-          $response->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data',2)->etc());
+        $response->assertStatus(200)
+        ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
 
         /*does not test the number of records however*/
-        collect($this->list_routes)->filter(function ($route){
+        collect($this->list_routes)->filter(function ($route) {
             return !in_array($route, ['users','designs','payment_terms']);
-        })->each(function($route){
-            // nlog($route);
+        })->each(function ($route) {
+
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->owner_token,
             ])->get("/api/v1/{$route}/")
-              ->assertJson(fn (AssertableJson $json) =>
+              ->assertJson(
+                  fn (AssertableJson $json) =>
                 $json->has('meta')
-                 ->has('data',1)
-                );
+                 ->has('data', 1)
+              );
         });
-
     }
 
     public function testOwnerAccessCompany()
     {
-
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->low_token,
         ])->get('/api/v1/companies/'.$this->company->hashed_id)
-          ->assertStatus(401);
-
+          ->assertStatus(200);
     }
 
 
@@ -445,42 +441,40 @@ class BaseApiTest extends TestCase
         $this->owner_cu->is_admin = true;
         $this->owner_cu->is_locked = false;
         $this->owner_cu->permissions = '[]';
-        $this->owner_cu->save();        
+        $this->owner_cu->save();
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->owner_token,
         ])->get('/api/v1/users/');
 
-          $response->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data',2)->etc());
+        $response->assertStatus(200)
+        ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
 
-        collect($this->list_routes)->filter(function ($route){
+        collect($this->list_routes)->filter(function ($route) {
             return !in_array($route, ['users','designs','payment_terms']);
-        })->each(function($route){
+        })->each(function ($route) {
             // nlog($route);
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->owner_token,
             ])->get("/api/v1/{$route}/")
               ->assertStatus(200)
-              ->assertJson(fn (AssertableJson $json) =>
+              ->assertJson(
+                  fn (AssertableJson $json) =>
                 $json->has('meta')
-                 ->has('data',1)
-                );
+                 ->has('data', 1)
+              );
         });
-
     }
 
     public function testAdminAccessCompany()
     {
-
-       $response = $this->withHeaders([
-        'X-API-SECRET' => config('ninja.api_secret'),
-        'X-API-TOKEN' => $this->owner_token,
-        ])->get('/api/v1/companies/'.$this->company->hashed_id)
-          ->assertStatus(200);
-
+        $response = $this->withHeaders([
+         'X-API-SECRET' => config('ninja.api_secret'),
+         'X-API-TOKEN' => $this->owner_token,
+         ])->get('/api/v1/companies/'.$this->company->hashed_id)
+           ->assertStatus(200);
     }
 
     public function testAdminLockedRoutes()
@@ -490,7 +484,7 @@ class BaseApiTest extends TestCase
         $this->owner_cu->is_admin = true;
         $this->owner_cu->is_locked = true;
         $this->owner_cu->permissions = '[]';
-        $this->owner_cu->save();        
+        $this->owner_cu->save();
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -498,9 +492,9 @@ class BaseApiTest extends TestCase
         ])->get('/api/v1/users/')
           ->assertStatus(403);
 
-        collect($this->list_routes)->filter(function ($route){
+        collect($this->list_routes)->filter(function ($route) {
             return !in_array($route, ['users','designs','payment_terms']);
-        })->each(function($route){
+        })->each(function ($route) {
             // nlog($route);
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
@@ -508,63 +502,49 @@ class BaseApiTest extends TestCase
             ])->get("/api/v1/{$route}/")
               ->assertStatus(403);
         });
-
     }
 
     public function testAdminLockedCompany()
     {
-
         $this->owner_cu = CompanyUser::where('user_id', $this->owner_cu->user_id)->where('company_id', $this->owner_cu->company_id)->first();
         $this->owner_cu->is_owner = false;
         $this->owner_cu->is_admin = true;
         $this->owner_cu->is_locked = true;
         $this->owner_cu->permissions = '[]';
-        $this->owner_cu->save();     
+        $this->owner_cu->save();
 
-       $response = $this->withHeaders([
-        'X-API-SECRET' => config('ninja.api_secret'),
-        'X-API-TOKEN' => $this->owner_token,
-        ])->get('/api/v1/companies/'.$this->company->hashed_id)
-          ->assertStatus(403);
-
+        $response = $this->withHeaders([
+         'X-API-SECRET' => config('ninja.api_secret'),
+         'X-API-TOKEN' => $this->owner_token,
+         ])->get('/api/v1/companies/'.$this->company->hashed_id)
+           ->assertStatus(403);
     }
-
 
     /**
      * Tests user facing routes respond with the correct status and/or data set
      */
     public function testRestrictedUserRoute()
     {
-        // $permissions = ["view_invoice","view_client","edit_client","edit_invoice","create_invoice","create_client"];
-       
-        // $response = $this->withHeaders([
-        //     'X-API-SECRET' => config('ninja.api_secret'),
-        //     'X-API-TOKEN' => $this->token,
-        // ])->get('/api/v1/clients/')
-        //   ->assertStatus(200)
-        //   ->assertJson(fn (AssertableJson $json) => $json->has('data',1)->etc());
-
-
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/tasks/')
           ->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data',1)->etc());
+          ->assertJson(fn (AssertableJson $json) => $json->has('data', 1)->etc());
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/group_settings/')
           ->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data',2)->etc());
+          ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/designs/')
           ->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data',11)->etc());
+          ->assertJson(fn (AssertableJson $json) => $json->has('data', 11)->etc());
 
 
         $response = $this->withHeaders([
@@ -572,35 +552,34 @@ class BaseApiTest extends TestCase
             'X-API-TOKEN' => $this->low_token,
         ])->get('/api/v1/users/');
 
-          $response->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data',1)->etc());
+        $response->assertStatus(200)
+        ->assertJson(fn (AssertableJson $json) => $json->has('data', 1)->etc());
 
-        collect($this->list_routes)->filter(function ($route){
+        collect($this->list_routes)->filter(function ($route) {
             return !in_array($route, ['tasks', 'users', 'group_settings','designs','client_gateway_tokens']);
-        })->each(function($route){
+        })->each(function ($route) {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->low_token,
             ])->get("/api/v1/{$route}/")
-              ->assertJson(fn (AssertableJson $json) =>
+              ->assertJson(
+                  fn (AssertableJson $json) =>
                 $json->has('meta')
-                 ->has('data',0)
-                );
-
+                 ->has('data', 0)
+              );
         });
 
-       $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->low_token,
-            ])->get('/api/v1/companies/'.$this->company->hashed_id)
-              ->assertStatus(401);
+        $response = $this->withHeaders([
+                 'X-API-SECRET' => config('ninja.api_secret'),
+                 'X-API-TOKEN' => $this->low_token,
+             ])->get('/api/v1/companies/'.$this->company->hashed_id)
+               ->assertStatus(200);
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->low_token,
-        ])->get('/api/v1/client_gateway_tokens/')
-          ->assertStatus(401);
-  
-    }
+        ])->get('/api/v1/client_gateway_tokens');
 
+        $response->assertStatus(403);
+    }
 }

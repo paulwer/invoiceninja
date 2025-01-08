@@ -4,7 +4,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2023. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -21,7 +21,7 @@ class PaymentTermFilters extends QueryFilters
     /**
      * Filter based on search text.
      *
-     * @param string query filter
+     * @param string $filter
      * @return Builder
      * @deprecated
      */
@@ -39,12 +39,16 @@ class PaymentTermFilters extends QueryFilters
     /**
      * Sorts the list based on $sort.
      *
-     * @param string sort formatted as column|asc
+     * @param string $sort formatted as column|asc
      * @return Builder
      */
-    public function sort(string $sort): Builder
+    public function sort(string $sort = ''): Builder
     {
         $sort_col = explode('|', $sort);
+
+        if (!is_array($sort_col) || count($sort_col) != 2) {
+            return $this->builder;
+        }
 
         return $this->builder->orderBy($sort_col[0], $sort_col[1]);
     }

@@ -21,8 +21,8 @@ use Tests\MockAccountData;
 use Tests\TestCase;
 
 /**
- * @test
- * @covers App\Http\Controllers\RecurringQuoteController
+ * 
+ *  App\Http\Controllers\RecurringQuoteController
  */
 class RecurringQuoteTest extends TestCase
 {
@@ -30,7 +30,9 @@ class RecurringQuoteTest extends TestCase
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    public $faker;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -49,7 +51,6 @@ class RecurringQuoteTest extends TestCase
 
     public function testRecurringQuoteListFilter()
     {
-
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
@@ -74,7 +75,7 @@ class RecurringQuoteTest extends TestCase
     {
         RecurringQuote::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
 
-        $RecurringQuote = RecurringQuote::query()->where('user_id', $this->user->id)->orderBy('id','DESC')->first();
+        $RecurringQuote = RecurringQuote::query()->where('user_id', $this->user->id)->orderBy('id', 'DESC')->first();
         $RecurringQuote->save();
 
         $response = $this->withHeaders([

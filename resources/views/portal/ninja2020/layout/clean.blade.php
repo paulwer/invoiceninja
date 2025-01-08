@@ -46,9 +46,6 @@
                     ga('send', 'event', category, action, this.src);
                 }
             </script>
-            <script>
-                Vue.config.devtools = true;
-            </script>
         @else
             <script>
                 function gtag() {
@@ -65,6 +62,8 @@
             <title>@yield('meta_title', '')</title>
         @endif
 
+        @yield('head')
+        
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="@yield('meta_description')"/>
@@ -73,8 +72,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <!-- Scripts -->
-        <script src="{{ mix('js/app.js') }}" defer></script>
-        <script src="{{ asset('vendor/alpinejs@2.8.2/alpine.js') }}" defer></script>
+        @vite('resources/js/app.js')
 
         <!-- Fonts -->
         <style>
@@ -90,8 +88,10 @@
         </style>
 
         <!-- Styles -->
-        <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+        @vite('resources/sass/app.scss')
+        @if(auth()->guard('contact')->user() && !auth()->guard('contact')->user()->user->account->isPaid())
         {{-- <link href="{{ mix('favicon.png') }}" rel="shortcut icon" type="image/png"> --}}
+        @endif
 
         <link rel="canonical" href="{{ config('ninja.app_url') }}/{{ request()->path() }}"/>
 
@@ -100,6 +100,11 @@
 
         @livewireStyles
 
+        @if((bool) \App\Utils\Ninja::isSelfHost() && isset($company))
+            <style>
+                {!! $company->settings->portal_custom_css !!}
+            </style>
+        @endif
         <link rel="stylesheet" type="text/css" href="{{ asset('vendor/cookieconsent@3/cookieconsent.min.css') }}" defer>
     </head>
 
@@ -114,7 +119,7 @@
 
         @yield('body')
 
-        @livewireScripts
+        @livewireScriptConfig 
 
         <script src="{{ asset('vendor/cookieconsent@3/cookieconsent.min.js') }}" data-cfasync="false"></script>
         <script>

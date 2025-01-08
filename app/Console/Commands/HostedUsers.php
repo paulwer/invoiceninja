@@ -4,16 +4,14 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2023. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Console\Commands;
 
-use App\Models\ClientContact;
 use App\Models\Company;
-use App\Models\User;
 use App\Utils\Ninja;
 use Illuminate\Console\Command;
 
@@ -46,7 +44,6 @@ class HostedUsers extends Command
     /**
      * Execute the console command.
      *
-     * @return int
      */
     public function handle()
     {

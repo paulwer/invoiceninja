@@ -31,13 +31,13 @@ use App\Models\Vendor;
 use Tests\TestCase;
 
 /**
- * @test
+ * 
  */
 class EntityTranslationTest extends TestCase
 {
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -175,7 +175,5 @@ class EntityTranslationTest extends TestCase
         $this->assertEquals(str_replace(" ", "_", ctrans('texts.invoice')) . "_xxx", $invoice->numberFormatter());
         $this->assertEquals(str_replace(" ", "_", ctrans('texts.quote')) . "_xxx", $quote->numberFormatter());
         $this->assertEquals(str_replace(" ", "_", ctrans('texts.purchase_order')) . "_xxx", $po->numberFormatter());
-
-
     }
 }

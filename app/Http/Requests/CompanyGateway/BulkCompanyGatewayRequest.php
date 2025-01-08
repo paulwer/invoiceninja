@@ -4,7 +4,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2023. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -24,31 +24,34 @@ class BulkCompanyGatewayRequest extends Request
      *
      * @return bool
      */
-    public function authorize() : bool
+    public function authorize(): bool
     {
-        return auth()->user()->isAdmin();
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        return $user->isAdmin();
     }
 
     public function rules()
     {
 
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         return [
-            'ids' => ['required','bail','array',Rule::exists('company_gateways','id')->where('company_id', auth()->user()->company()->id)],
+            'ids' => ['required','bail','array',Rule::exists('company_gateways', 'id')->where('company_id', $user->company()->id)],
             'action' => 'required|bail|in:archive,restore,delete'
         ];
-
     }
 
     public function prepareForValidation()
     {
         $input = $this->all();
 
-        if(isset($input['ids']))
+        if (isset($input['ids'])) {
             $input['ids'] = $this->transformKeys($input['ids']);
+        }
 
         $this->replace($input);
     }
-
-
-
 }

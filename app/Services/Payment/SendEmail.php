@@ -4,7 +4,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2023. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -12,47 +12,45 @@
 namespace App\Services\Payment;
 
 use App\Jobs\Payment\EmailPayment;
+use App\Models\ClientContact;
+use App\Models\Payment;
+use Illuminate\Database\QueryException;
 
 class SendEmail
 {
-    public $payment;
-
-    public $contact;
-
-    public function __construct($payment, $contact)
+    public function __construct(public Payment $payment, public ?ClientContact $contact)
     {
-        $this->payment = $payment;
-
-        $this->contact = $contact;
     }
 
     /**
      * Builds the correct template to send.
-     * @return void
      */
     public function run()
     {
-        $this->payment->load('company', 'client.contacts','invoices');
+        $this->payment->load('company', 'invoices');
 
-        $contact = $this->payment->client->contacts()->first();
+        if (!$this->contact) {
 
-        // if ($contact?->email)
-        //     EmailPayment::dispatch($this->payment, $this->payment->company, $contact)->delay(now()->addSeconds(2));
+            if ($invoice = $this->payment->invoices->first() ?? false) {
 
+                $invitation =
+                $invoice
+                    ->invitations()
+                    ->whereHas("contact", function ($q) {
+                        $q->where('send_email', true)->orderBy("is_primary", 'ASC');
+                    })
+                    ->first();
 
-        $this->payment->invoices->sortByDesc('id')->first(function ($invoice){
-
-            $invoice->invitations->each(function ($invitation) {
-
-                if(!$invitation->contact->trashed() && $invitation->contact->email) {
-
-                    EmailPayment::dispatch($this->payment, $this->payment->company, $invitation->contact)->delay(now()->addSeconds(2));
-
+                if ($invitation) {
+                    $this->contact = $invitation->contact;
+                } else {
+                    $this->contact = $this->payment->client->contacts()->orderBy('send_email', 'desc')->orderBy('is_primary', 'desc')->first();
                 }
+            }
 
-            });
+        }
 
-        });
-         
+        EmailPayment::dispatch($this->payment, $this->payment->company, $this->contact);
+
     }
 }

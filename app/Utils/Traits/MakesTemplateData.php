@@ -4,7 +4,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2023. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -16,7 +16,7 @@ namespace App\Utils\Traits;
  */
 trait MakesTemplateData
 {
-    public function makeFakerLabels() :array
+    public function makeFakerLabels(): array
     {
         $data = [];
 
@@ -36,7 +36,7 @@ trait MakesTemplateData
      * @return array returns an array
      * of keyed labels (appended with _label)
      */
-    public function makeFakerValues() :array
+    public function makeFakerValues(): array
     {
         $data = [];
 
@@ -116,6 +116,8 @@ trait MakesTemplateData
         $data['$quote_total'] = ['value' => '$20.00', 'label' => ctrans('texts.quote_total')];
         $data['$credit_amount'] = ['value' => '$15.00', 'label' => ctrans('texts.credit_amount')];
         $data['$credit_balance'] = ['value' => '$12.00', 'label' => ctrans('texts.credit_balance')];
+        $data['$invoice_references'] = ['value' => 'Invoice #2222', 'label' => ctrans('texts.invoices')];
+        $data['$invoice_references_subject'] = ['value' => 'Invoice #2222', 'label' => ctrans('texts.invoices')];
 
         $data['$credit_number'] = &$data['$number'];
         $data['$credit_no'] = &$data['$number'];
@@ -203,7 +205,8 @@ trait MakesTemplateData
         $data['$task.tax_name3'] = ['value' => 'CA Sales Tax', 'label' => ctrans('texts.tax')];
         $data['$task.line_total'] = ['value' => '$100.00', 'label' => ctrans('texts.line_total')];
 
-        $data['$vendor_name'] = ['value' => 'Joey Diaz Denkins', 'label' => ctrans('texts.vendor_name')];;
+        $data['$vendor_name'] = ['value' => 'Joey Diaz Denkins', 'label' => ctrans('texts.vendor_name')];
+        ;
         $data['$vendor.name'] = &$data['$vendor_name'];
         $data['$vendor'] = &$data['$vendor_name'];
 
@@ -224,7 +227,7 @@ trait MakesTemplateData
         $data['$vendor.postal_city'] = &$data['$postal_city'];
         $data['$vendor.country'] = &$data['$country'];
         $data['$vendor.email'] = &$data['$email'];
-        
+
         $data['$vendor.billing_address1'] = &$data['$vendor.address1'];
         $data['$vendor.billing_address2'] = &$data['$vendor.address2'];
         $data['$vendor.billing_city'] = &$data['$vendor.city'];

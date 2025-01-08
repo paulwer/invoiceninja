@@ -11,21 +11,24 @@
 
 namespace Tests\Feature;
 
+use App\Models\Design;
+use App\Models\InvoiceInvitation;
+use App\Utils\HtmlEngine;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Tests\MockAccountData;
 use Tests\TestCase;
 
 /**
- * @test
- * @covers App\Http\Controllers\PreviewController
+ * 
+ *  App\Http\Controllers\PreviewController
  */
 class LiveDesignTest extends TestCase
 {
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,21 +37,42 @@ class LiveDesignTest extends TestCase
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
-        
+
         if (config('ninja.testvars.travis') !== false) {
-            $this->markTestSkipped('Skip test for Travis');
+            $this->markTestSkipped('Skip test for GH Actions');
         }
+    }
+
+    public function testSyntheticInvitations()
+    {
+        $this->assertGreaterThanOrEqual(1, $this->client->contacts->count());
+
+        $ii = InvoiceInvitation::factory()
+        ->for($this->invoice)
+        ->for($this->client->contacts->first(), 'contact')
+        ->for($this->company)
+        ->for($this->user)
+        ->make();
+
+        $this->assertInstanceOf(InvoiceInvitation::class, $ii);
+
+        $engine = new HtmlEngine($ii);
+
+        $this->assertNotNull($engine);
+
+        $data = $engine->generateLabelsAndValues();
+
+        $this->assertIsArray($data);
 
     }
 
     public function testDesignRoute200()
     {
-    	$data = [
-    		'entity' => 'invoice',
-    		'entity_id' => $this->invoice->hashed_id,
-    		'settings_type' => 'company',
-    		'settings' => (array)$this->company->settings,
-    	];
+        $data = [
+            'entity_type' => 'invoice',
+            'settings_type' => 'company',
+            'settings' => (array)$this->company->settings,
+        ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -58,5 +82,25 @@ class LiveDesignTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function testDesignWithCustomDesign()
+    {
 
+        $d = Design::find(1);
+
+
+        $data = [
+            'entity_type' => 'invoice',
+            'settings_type' => 'company',
+            'settings' => (array)$this->company->settings,
+            'design' => (array)$d->design,
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->post('/api/v1/live_design/', $data);
+
+        $response->assertStatus(200);
+
+    }
 }

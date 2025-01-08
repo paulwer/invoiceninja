@@ -20,7 +20,8 @@ use Tests\TestCase;
 
 class ExampleIntegrationTest extends TestCase
 {
-    use MakesInvoiceValues, MockAccountData;
+    use MakesInvoiceValues;
+    use MockAccountData;
 
     protected function setUp(): void
     {
@@ -49,6 +50,10 @@ class ExampleIntegrationTest extends TestCase
                 'pdf_variables' => (array) $invoice->company->settings->pdf_variables,
             ]),
             'variables' => $engine->generateLabelsAndValues(),
+             'options' => [
+                'client' => $invoice->client,
+                'invoices' => [$invoice]
+            ],
         ];
 
         $maker = new PdfMaker($state);
