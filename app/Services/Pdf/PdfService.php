@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -120,14 +121,11 @@ class PdfService
     public function getHtml(): string
     {
 
-        $html = $this->builder->getCompiledHTML();
+        $html = \App\Services\Pdf\Purify::clean($this->builder->document->saveHTML());
 
         if (config('ninja.log_pdf_html')) {
             nlog($html);
         }
-
-        $this->execution_time = microtime(true) - $this->start_time;
-
         return $html;
     }
 
@@ -220,10 +218,10 @@ class PdfService
             $pdfBuilder = new ZugferdDocumentPdfBuilder($e_rechnung, $pdf);
             $pdfBuilder->generateDocument();
 
-            return $pdfBuilder->downloadString(basename($this->config->entity->getFileName()));
+            return $pdfBuilder->downloadString();
 
-        } catch (\Exception $e) {
-            nlog("E_Invoice Merge failed - " . $e->getMessage());
+        } catch (\Throwable $th) {
+            nlog("E_Invoice Merge failed - " . $th->getMessage());
         }
 
         return $pdf;

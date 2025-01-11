@@ -209,6 +209,13 @@ class InvoiceItemSumInclusive
         $this->item->tax_name3 = $this->rule->tax_name3;
         $this->item->tax_rate3 = round($this->rule->tax_rate3, $precision);
 
+        $this->invoice->tax_name1 = '';
+        $this->invoice->tax_rate1 = 0;
+        $this->invoice->tax_name2 = '';
+        $this->invoice->tax_rate2 = 0;
+        $this->invoice->tax_name3 = '';
+        $this->invoice->tax_rate3 = 0;
+
         return $this;
     }
 
@@ -264,6 +271,12 @@ class InvoiceItemSumInclusive
         }
 
         $this->item->tax_amount = $this->formatValue($item_tax, $this->currency->precision);
+
+        try{
+            $this->item->net_cost = round(($amount - $this->item->tax_amount)/$this->item->quantity, $this->currency->precision);
+        } catch (\DivisionByZeroError $e) {
+            $this->item->net_cost = $this->item->cost;
+        }
 
         $this->setTotalTaxes($this->formatValue($item_tax, $this->currency->precision));
 
@@ -360,13 +373,11 @@ class InvoiceItemSumInclusive
     {
         $this->setGroupedTaxes(collect([]));
 
-
         foreach ($this->line_items as $this->item) {
             if ($this->sub_total == 0) {
                 $amount = $this->item->line_total;
             } else {
                 $amount = $this->item->line_total - ($this->invoice->discount * ($this->item->line_total / $this->sub_total));
-                // $amount = $this->item->line_total - ($this->item->line_total * ($this->invoice->discount / $this->sub_total));
             }
 
             $item_tax = 0;
@@ -399,6 +410,13 @@ class InvoiceItemSumInclusive
             $this->item->gross_line_total = $this->getLineTotal();
 
             $this->item->tax_amount = $item_tax;
+
+            try{
+                $this->item->net_cost = round($amount * (100 / (100 + ($this->item->tax_rate1+$this->item->tax_rate2+$this->item->tax_rate3))) / $this->item->quantity, $this->currency->precision+1);
+                $this->item->net_cost = round($this->item->net_cost, $this->currency->precision);
+            } catch (\DivisionByZeroError $e) {
+                $this->item->net_cost = $this->item->cost;
+            }
 
         }
 
