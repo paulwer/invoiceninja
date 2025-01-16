@@ -102,6 +102,7 @@ class Product extends BaseModel
         'max_quantity',
         'product_image',
         'tax_id',
+        'product_type',
     ];
 
     protected $casts = [
@@ -199,6 +200,11 @@ class Product extends BaseModel
     public function product_allocations()
     {
         return $this->hasMany(ProductAllocation::class)->withTrashed();
+    }
+
+    public function product_type()
+    {
+        return $this->hasMany(ProductType::class)->withTrashed();
     }
 
     public function documents()

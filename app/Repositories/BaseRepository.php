@@ -321,6 +321,7 @@ class BaseRepository
             }
 
             /* Update product allocations if necessary - if we are inside a transaction - do nothing */
+            // TODO: when to invoke => maybe remove
             if ($model->company->update_products && $model->id && \DB::transactionLevel() == 0) {
                 UpdateOrCreateProductAllocation::dispatch($model->line_items, $model, $model->company);
             }
